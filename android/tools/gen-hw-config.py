@@ -117,7 +117,7 @@ if lastItem:
 if targetFile == '--':
     out = sys.stdout
 else:
-    out = open(targetFile,"wb")
+    out = open(targetFile,"w")
 
 out.write(targetHeader)
 
