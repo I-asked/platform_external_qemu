@@ -181,7 +181,7 @@ const int %(name)s_qtypes[QTYPE_MAX] = {
 
     for key in members:
         qapi_type = members[key]
-        if builtin_type_qtypes.has_key(qapi_type):
+        if qapi_type in builtin_type_qtypes:
             qtype = builtin_type_qtypes[qapi_type]
         elif find_struct(qapi_type):
             qtype = "QTYPE_QDICT"
@@ -285,8 +285,8 @@ try:
     opts, args = getopt.gnu_getopt(sys.argv[1:], "chbp:o:",
                                    ["source", "header", "builtins",
                                     "prefix=", "output-dir="])
-except getopt.GetoptError, err:
-    print str(err)
+except getopt.GetoptError as err:
+    print(str(err))
     sys.exit(1)
 
 output_dir = ""
@@ -319,7 +319,7 @@ h_file = output_dir + prefix + h_file
 
 try:
     os.makedirs(output_dir)
-except os.error, e:
+except os.error as e:
     if e.errno != errno.EEXIST:
         raise
 
@@ -327,8 +327,8 @@ def maybe_open(really, name, opt):
     if really:
         return open(name, opt)
     else:
-        import StringIO
-        return StringIO.StringIO()
+        import io
+        return io.StringIO()
 
 fdef = maybe_open(do_c, c_file, 'w')
 fdecl = maybe_open(do_h, h_file, 'w')
@@ -382,7 +382,7 @@ fdecl.write(mcgen('''
                   guard=guardname(h_file)))
 
 exprs = parse_schema(sys.stdin)
-exprs = filter(lambda expr: not expr.has_key('gen'), exprs)
+exprs = [expr for expr in exprs if 'gen' not in expr]
 
 fdecl.write(guardstart("QAPI_TYPES_BUILTIN_STRUCT_DECL"))
 for typename in builtin_types:
@@ -391,16 +391,16 @@ fdecl.write(guardend("QAPI_TYPES_BUILTIN_STRUCT_DECL"))
 
 for expr in exprs:
     ret = "\n"
-    if expr.has_key('type'):
+    if 'type' in expr:
         ret += generate_fwd_struct(expr['type'], expr['data'])
-    elif expr.has_key('enum'):
+    elif 'enum' in expr:
         ret += generate_enum(expr['enum'], expr['data']) + "\n"
         ret += generate_fwd_enum_struct(expr['enum'], expr['data'])
         fdef.write(generate_enum_lookup(expr['enum'], expr['data']))
-    elif expr.has_key('union'):
+    elif 'union' in expr:
         ret += generate_fwd_struct(expr['union'], expr['data']) + "\n"
-        ret += generate_enum('%sKind' % expr['union'], expr['data'].keys())
-        fdef.write(generate_enum_lookup('%sKind' % expr['union'], expr['data'].keys()))
+        ret += generate_enum('%sKind' % expr['union'], list(expr['data'].keys()))
+        fdef.write(generate_enum_lookup('%sKind' % expr['union'], list(expr['data'].keys())))
         if expr.get('discriminator') == {}:
             fdef.write(generate_anon_union_qtypes(expr))
     else:
@@ -425,19 +425,19 @@ if do_builtins:
 
 for expr in exprs:
     ret = "\n"
-    if expr.has_key('type'):
+    if 'type' in expr:
         ret += generate_struct(expr) + "\n"
         ret += generate_type_cleanup_decl(expr['type'] + "List")
         fdef.write(generate_type_cleanup(expr['type'] + "List") + "\n")
         ret += generate_type_cleanup_decl(expr['type'])
         fdef.write(generate_type_cleanup(expr['type']) + "\n")
-    elif expr.has_key('union'):
+    elif 'union' in expr:
         ret += generate_union(expr)
         ret += generate_type_cleanup_decl(expr['union'] + "List")
         fdef.write(generate_type_cleanup(expr['union'] + "List") + "\n")
         ret += generate_type_cleanup_decl(expr['union'])
         fdef.write(generate_type_cleanup(expr['union']) + "\n")
-    elif expr.has_key('enum'):
+    elif 'enum' in expr:
         ret += generate_type_cleanup_decl(expr['enum'] + "List")
         fdef.write(generate_type_cleanup(expr['enum'] + "List") + "\n")
     else:

@@ -82,47 +82,47 @@ def quote(s):
 def process_line(line,result):
     m = re_start.match(line)
     if not m:
-        print "bad bad line: " + line
+        print("bad bad line: " + line)
         return -1
     keycode = m.group(1)
     line    = m.group(2)
     m = match_char_or_hex(line)
     if not m:
-        print "character expected in: " + line
+        print("character expected in: " + line)
         return -1
     disp = quote(m.group(1))
     line = m.group(2)
     m = match_char_or_hex(line)
     if not m:
-        print "character expected in: " + line
+        print("character expected in: " + line)
         return -1
     number = quote(m.group(1))
     line = m.group(2)
     m = match_char_or_hex(line)
     if not m:
-        print "character expected in: " + line
+        print("character expected in: " + line)
         return -1
     base = quote(m.group(1))
     line = m.group(2)
     m = match_char_or_hex(line)
     if not m:
-        print "character expected in: " + line
+        print("character expected in: " + line)
         return -1
     caps = quote(m.group(1))
     line = m.group(2)
     m = match_char_or_hex(line)
     if not m:
-        print "character expected in: " + line
+        print("character expected in: " + line)
         return -1
     fn = quote(m.group(1))
     line = m.group(2)
     m = match_char_or_hex(line)
     if not m:
-        print "character expected in: " + line
+        print("character expected in: " + line)
         return -1
     caps_fn = quote(m.group(1))
 
-    if specials.has_key(keycode):
+    if keycode in specials:
         keycode = specials[keycode]
     keycode = "kKeyCode" + keycode
 
@@ -132,7 +132,7 @@ def process_line(line,result):
 def process_file( file ):
     result = []
     fp = open(file,"rb")
-    for line in fp.xreadlines():
+    for line in fp:
         line = line.strip()
         if not line:   # skip empty lines
             continue
@@ -150,21 +150,21 @@ class KMap:
 
     def dump(self):
         t = { 'name': self.name, 'count':len(self.results) }
-        print kmap_header % t
+        print(kmap_header % t)
         for item in self.results:
-            print "    { %-22s, %5s, %5s, %5s, %6s, %5s }," % item
-        print kmap_footer % t
+            print("    { %-22s, %5s, %5s, %5s, %6s, %5s }," % item)
+        print(kmap_footer % t)
 
 kmaps = []
 
 if len(sys.argv) < 2:
-    print "usage: progname  charmap.kcm [charmap2.kcm ...] > charmap-tab.h"
+    print("usage: progname  charmap.kcm [charmap2.kcm ...] > charmap-tab.h")
 else:
     genline = ""
     for filepath in sys.argv[1:]:
         m = re_mapname.match(filepath)
         if not m:
-            print "%s is not a keyboard charmap name" % filepath
+            print("%s is not a keyboard charmap name" % filepath)
             os.exit(1)
 
         mapname = m.group(1)
@@ -177,14 +177,14 @@ else:
         kmap = KMap(mapname,result)
         kmaps.append(kmap)
 
-    print header + genline + header2
+    print(header + genline + header2)
     for kmap in kmaps:
         kmap.dump()
 
-    print "const AKeyCharmap*  android_charmaps[%d] = {" % len(kmaps),
+    print("const AKeyCharmap*  android_charmaps[%d] = {" % len(kmaps), end=' ')
     comma = ""
     for kmap in kmaps:
-        print "%s&_%s_charmap" % (comma, kmap.name),
+        print("%s&_%s_charmap" % (comma, kmap.name), end=' ')
         comma = ", "
-    print "};"
-    print "const int           android_charmap_count = %d;" % len(kmaps)
+    print("};")
+    print("const int           android_charmap_count = %d;" % len(kmaps))

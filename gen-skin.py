@@ -37,7 +37,7 @@ def process_files( basepath, files ):
         data_name = "_data_" + string.replace(file,".","_")
 
         entries.append( (file, data_name, len(data)) )
-        print "static const unsigned char %s[%d] = {" % (data_name, data_len + data_add)
+        print("static const unsigned char %s[%d] = {" % (data_name, data_len + data_add))
         comma = "    "
         do_line = 0
         do_comma = 0
@@ -51,7 +51,7 @@ def process_files( basepath, files ):
                 do_comma = 0
 
             if do_line:
-                print line
+                print(line)
                 line = "    "
                 do_line = 0
 
@@ -63,16 +63,16 @@ def process_files( basepath, files ):
                 do_line = 1
 
         if len(line) > 0:
-            print line
-        print "};\n"
+            print(line)
+        print("};\n")
 
 if len(sys.argv) != 2:
-    print "usage: progname  skindirpath > default-skin.h"
+    print("usage: progname  skindirpath > default-skin.h")
 else:
-    print header
+    print(header)
     skindir = sys.argv[1]
     process_files( skindir, os.listdir(skindir) )
-    print footer
+    print(footer)
     for e in entries:
-        print "    { \"%s\", %s, %d }," % (e[0], e[1], e[2])
-    print footer2
+        print("    { \"%s\", %s, %d }," % (e[0], e[1], e[2]))
+    print(footer2)

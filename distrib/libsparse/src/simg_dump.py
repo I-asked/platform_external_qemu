@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 import getopt, posixpath, signal, struct, sys
 
 def usage(argv0):
@@ -36,7 +36,7 @@ def main():
     opts, args = getopt.getopt(sys.argv[1:],
                                "v",
                                ["verbose"])
-  except getopt.GetoptError, e:
+  except getopt.GetoptError as e:
     print(e)
     usage(me)
   for o, a in opts:
@@ -93,7 +93,7 @@ def main():
     print("            input_bytes      output_blocks")
     print("chunk    offset     number  offset  number")
     offset = 0
-    for i in xrange(1,total_chunks+1):
+    for i in range(1,total_chunks+1):
       header_bin = FH.read(12)
       header = struct.unpack("<2H2I", header_bin)
       chunk_type = header[0]

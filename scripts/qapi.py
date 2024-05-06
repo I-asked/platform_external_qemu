@@ -161,26 +161,26 @@ class QAPISchema:
 def parse_schema(fp):
     try:
         schema = QAPISchema(fp)
-    except QAPISchemaError, e:
-        print >>sys.stderr, e
+    except QAPISchemaError as e:
+        print(e, file=sys.stderr)
         exit(1)
 
     exprs = []
 
     for expr in schema.exprs:
-        if expr.has_key('enum'):
+        if 'enum' in expr:
             add_enum(expr['enum'])
-        elif expr.has_key('union'):
+        elif 'union' in expr:
             add_union(expr)
             add_enum('%sKind' % expr['union'])
-        elif expr.has_key('type'):
+        elif 'type' in expr:
             add_struct(expr)
         exprs.append(expr)
 
     return exprs
 
 def parse_args(typeinfo):
-    if isinstance(typeinfo, basestring):
+    if isinstance(typeinfo, str):
         struct = find_struct(typeinfo)
         assert struct != None
         typeinfo = struct['data']
@@ -342,7 +342,7 @@ def pop_indent(indent_amount=4):
 def cgen(code, **kwds):
     indent = genindent(indent_level)
     lines = code.split('\n')
-    lines = map(lambda x: indent + x, lines)
+    lines = [indent + x for x in lines]
     return '\n'.join(lines) % kwds + '\n'
 
 def mcgen(code, **kwds):

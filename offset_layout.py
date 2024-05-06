@@ -14,7 +14,7 @@ def main():
   ParseInput()
 
 def Usage():
-  print >>sys.stderr, """
+  print("""
   Usage: %s --dx offset-x-display --dy offset-y-display --px offset-x-phone-buttons --py offset-y-phone-buttons --kx offset-x-keyboard --ky offset-y-keyboard < layout > layout2.
 
   Unspecified offsets default to 0 (unchanged).
@@ -24,7 +24,7 @@ def Usage():
 
   If your shell doesn't let you use negative integers, use _ for minus sign,
   i.e. --dx _40 --dy _42 for <-40,-42).
-  """ % (sys.argv[0])
+  """ % (sys.argv[0]), file=sys.stderr)
   sys.exit(1)
 
 def ParseArgs():
@@ -46,7 +46,7 @@ def ParseArgs():
         KY = int(value.replace("_", "-"))
       else:
         Usage()
-  except getopt.error, msg:
+  except getopt.error as msg:
     Usage()
 
 def ParseInput():
@@ -67,7 +67,7 @@ def ParseInput():
         mode = keyword
         is_phone = False
         is_keyboard = False
-        print >>sys.stderr, "Mode:", mode
+        print("Mode:", mode, file=sys.stderr)
       else:
         if mode == "button" and "{" in line:
           is_phone = keyword in PHONE
